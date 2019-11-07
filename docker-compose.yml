@@ -1,0 +1,40 @@
+version: '3.3'
+
+services:
+
+  web:
+    container_name: web-poc
+    image: aapit/fast-wp-web:feature_nginx-alpine
+    volumes:
+      - $PWD/app:/var/www/html
+    labels:
+      - traefik.http.routers.my-container.rule=Host(`poobar.localhost`)
+    links:
+      - php
+
+  php:
+    container_name: php-poc
+    image: aapit/fast-wp-php:feature_php7.3-fpm-alpine
+    volumes:
+      - $PWD/app:/var/www/html
+      - $PWD/add-reverse-proxy-host.sh:/var/www/add-reverse-proxy-host.sh
+    user: root
+    labels:
+      - traefik.backend=builder
+      - traefik.frontend.rule=Host:builder.docker.localhost
+      - traefik.docker.network=proxy
+      - traefik.port=80
+    entrypoint:
+      - /bin/sh
+      - -c
+      - nohup ./add-reverse-proxy-host.sh web poobar.localhost && php-fpm
+
+  router:
+    container_name: router-poc
+    image: traefik:v2.0-alpine
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - $PWD/config/traefik/traefik.yml:/etc/traefik/traefik.yml
+      - /var/run/docker.sock:/var/run/docker.sock
