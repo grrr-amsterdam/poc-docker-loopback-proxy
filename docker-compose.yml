@@ -19,11 +19,6 @@ services:
       - $PWD/app:/var/www/html
       - $PWD/add-reverse-proxy-host.sh:/var/www/add-reverse-proxy-host.sh
     user: root
-    labels:
-      - traefik.backend=builder
-      - traefik.frontend.rule=Host:builder.docker.localhost
-      - traefik.docker.network=proxy
-      - traefik.port=80
     entrypoint:
       - /bin/sh
       - -c
