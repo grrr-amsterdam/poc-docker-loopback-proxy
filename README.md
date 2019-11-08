@@ -32,6 +32,7 @@ make curl
 make curl-from-internal
 ```
 
+You can also use the other methods in the `Makefile`, like `make open-admin` to open the Traefik dashboard in your browser.
 
 ## Alternative solutions
 This could theoretically also be done with a dual Docker setup, defining proxy network routing requests, and a shielded internal network. However, this has other cons, one being the requirement of a newer Docker Compose version.
