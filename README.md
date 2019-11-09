@@ -34,9 +34,24 @@ make curl-from-internal
 
 You can also use the other methods in the `Makefile`, like `make open-admin` to open the Traefik dashboard in your browser.
 
+
+## The fiddlings - how do they work?
+Suppose you make a call to `poobar.localhost` from your host. Because it's a `.localhost` domain, it loops back to `127.0.0.1` on port `80`.
+
+
+This Docker cluster is set up to listen to those requests. It routes all edge requests through Traefik. When you then call `poobar.localhost`, Traefik is configured to direct these requests to the `web` container, running nginx.
+
+
+Because it's a request for a `php` file, nginx knows it should call upon the `php` container, running `php-fpm` on the standard `9000` fastcgi port.
+
+
+A shell script is triggered by `docker-compose.yml`, that adds a mock `.localhost` entry to the `hosts` file to the `php` container. Normally, a request to a `.localhost` domain from the `php` container would loop back to itself. After running the script, requests from the `php` container to `poobar.localhost` will route requests to the `router` container running Traefik.
+
+
+This makes sure that a request ends up in the same place as it would if it came from you.
+
+
+
 ## Alternative solutions
 This could theoretically also be done with a dual Docker setup, defining proxy network routing requests, and a shielded internal network. However, this has other cons, one being the requirement of a newer Docker Compose version.
 
-
-## The fiddlings - how do they work?
-It adds a mock `.localhost` entry to a specified container (f.i. `myproject.localhost`). 
