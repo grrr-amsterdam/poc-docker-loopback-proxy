@@ -20,4 +20,6 @@ NAMESERVER=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
 NSLOOKUP="$(nslookup ${REV_PROXY_SERVICE} ${NAMESERVER})"
 REV_PROXY_IP=$(printf "${NSLOOKUP}" | grep 'Address 1' | grep ${REV_PROXY_SERVICE} | awk '{print $3'})
 
+[ -z "$REV_PROXY_IP" ] && echo "Unable to find '${REV_PROXY_SERVICE}'. Provide a valid service name." && exit 1
+
 echo "${REV_PROXY_IP} ${REV_PROXY_DOMAIN}" >> /etc/hosts
